@@ -3,6 +3,10 @@ import { NEAR_TESTNET_CONFIG as NEAR_CONFIG } from "./constant";
 import logger from "./logger";
 import { EventLogActions } from "./db/mongoDB/actions/eventLog";
 import { ChainStateActions } from "./db/mongoDB/actions/chainState";
+import { getLastSyncedBlock, updateLastUpdatedBlock } from "./db/mongoDB/mongodb/action/chainState";
+import { createCollection } from "./db/mongoDB/mongodb";
+import { Collection, Db } from "mongodb";
+import { putNewEventLog } from "./db/mongoDB/mongodb/action/eventLog";
 
 // const FUNDS_PAID = "funds_paid";
 // const FUNDS_PAID_WITH_MESSAGE = "funds_paid_with_message";
@@ -40,11 +44,13 @@ const lakeConfig: types.LakeConfig = {
 };
 
 // const chainStateCollObj = new IndividualChainStateCollection();
-const chainStateActions = new ChainStateActions();
-const eventLogActions = new EventLogActions();
+// const chainStateActions = new ChainStateActions();
+// const eventLogActions = new EventLogActions();
 
 export async function handleStreamerMessage(
-    streamerMessage: types.StreamerMessage
+    streamerMessage: types.StreamerMessage,
+    eventlogcollection: Collection<Document>,
+    chainStatecollection: Collection<Document>
 ): Promise<void> {
     logger.info(
         `${NEAR_CONFIG.networkId} Block # Shards: ${JSON.stringify(
@@ -78,7 +84,7 @@ export async function handleStreamerMessage(
                         }
                     }
                     if (validLogs.length > 0) {
-                        const response = await eventLogActions.putNewBlock(
+                        const response = await putNewEventLog(eventlogcollection,
                             {
                                 blockHash: streamerMessage.block.header.hash,
                                 height: streamerMessage.block.header.height,
@@ -99,7 +105,8 @@ export async function handleStreamerMessage(
                 }
             }
         }
-        await chainStateActions.updateLastUpdatedBlock(
+        await updateLastUpdatedBlock(
+            chainStatecollection,
             streamerMessage.block.header.height
         );
         logger.info(`Updating last block:${streamerMessage.block.header.height}`);
@@ -112,16 +119,17 @@ export async function handleStreamerMessage(
     }
 }
 
-export const startStreamService = async () => {
+export const startStreamService = async (db: Db) => {
     try {
-        const lastSyncedBlock = await chainStateActions.getLastSyncedBlock(
-        );
+        const eventlogcollection = await createCollection(db, "eventlogs");
+        const chainStatecollection = await createCollection(db, "chainstates");
+        const lastSyncedBlock = await getLastSyncedBlock(chainStatecollection);
         const startBlock = lastSyncedBlock
             ? lastSyncedBlock + 1
             : lakeConfig.startBlockHeight;
         const latestLakeConfig = { ...lakeConfig, startBlockHeight: startBlock };
         logger.info(`Starting stream from block ${startBlock}`);
-        await startStream(latestLakeConfig, handleStreamerMessage);
+        await startStream(latestLakeConfig, (streamerMessage: types.StreamerMessage) => handleStreamerMessage(streamerMessage, eventlogcollection, chainStatecollection));
     } catch (e) {
         logger.error(`${NEAR_CONFIG.networkId} error - ${e}`);
         // await sendSlackMessage(`startStreamService stopped - ${JSON.stringify(e)}`);

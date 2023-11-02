@@ -23,7 +23,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
-    "mongodb": "^5.0.1",
+    "mongodb": "^6.2.0",
     "mongoose": "^6.9.1",
     "near-api-js": "^2.1.4",
     "near-lake-framework": "^2.0.0",
