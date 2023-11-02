@@ -1,0 +1,15 @@
+version: '1.2'
+
+services:
+  streamer:
+    build: .
+    environment:
+      - MONGO_DB_URI=mongodb://mongodb:27017/
+    ports:
+      - '6900:6900'
+    depends_on:
+      - mongodb
+  mongodb:
+    image: mongo:6-jammy
+    ports:
+      - '27017:27017'
