@@ -1,12 +1,10 @@
 import { startStream, types } from "near-lake-framework";
 import { NEAR_TESTNET_CONFIG as NEAR_CONFIG } from "./constant";
 import logger from "./logger";
-import { EventLogActions } from "./db/mongoDB/actions/eventLog";
-import { ChainStateActions } from "./db/mongoDB/actions/chainState";
-import { getLastSyncedBlock, updateLastUpdatedBlock } from "./db/mongoDB/mongodb/action/chainState";
-import { createCollection } from "./db/mongoDB/mongodb";
-import { Collection, Db } from "mongodb";
-import { putNewEventLog } from "./db/mongoDB/mongodb/action/eventLog";
+import { getLastSyncedBlock, updateLastUpdatedBlock } from "./db/mongoDB/action/chainState";
+import { DBInstance, getCollection } from "./db/mongoDB/";
+import { Collection, DBRef, Db } from "mongodb";
+import { putNewEventLog } from "./db/mongoDB/action/eventLog";
 
 // const FUNDS_PAID = "funds_paid";
 // const FUNDS_PAID_WITH_MESSAGE = "funds_paid_with_message";
@@ -48,10 +46,11 @@ const lakeConfig: types.LakeConfig = {
 // const eventLogActions = new EventLogActions();
 
 export async function handleStreamerMessage(
-    streamerMessage: types.StreamerMessage,
-    eventlogcollection: Collection<Document>,
-    chainStatecollection: Collection<Document>
+    streamerMessage: types.StreamerMessage
 ): Promise<void> {
+    const eventlogcollection = await getCollection("eventlogs");
+    const chainStatecollection = await getCollection("chainstates");
+
     logger.info(
         `${NEAR_CONFIG.networkId} Block # Shards: ${JSON.stringify(
             streamerMessage.block.header.height
@@ -119,17 +118,17 @@ export async function handleStreamerMessage(
     }
 }
 
-export const startStreamService = async (db: Db) => {
+export const startStreamService = async () => {
     try {
-        const eventlogcollection = await createCollection(db, "eventlogs");
-        const chainStatecollection = await createCollection(db, "chainstates");
+        const eventlogcollection = await getCollection("eventlogs");
+        const chainStatecollection = await getCollection("chainstates");
         const lastSyncedBlock = await getLastSyncedBlock(chainStatecollection);
         const startBlock = lastSyncedBlock
             ? lastSyncedBlock + 1
             : lakeConfig.startBlockHeight;
         const latestLakeConfig = { ...lakeConfig, startBlockHeight: startBlock };
         logger.info(`Starting stream from block ${startBlock}`);
-        await startStream(latestLakeConfig, (streamerMessage: types.StreamerMessage) => handleStreamerMessage(streamerMessage, eventlogcollection, chainStatecollection));
+        await startStream(latestLakeConfig, handleStreamerMessage);
     } catch (e) {
         logger.error(`${NEAR_CONFIG.networkId} error - ${e}`);
         // await sendSlackMessage(`startStreamService stopped - ${JSON.stringify(e)}`);

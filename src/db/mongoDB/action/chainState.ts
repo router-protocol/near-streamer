@@ -1,4 +1,4 @@
-import { Collection, Db, MongoClient, OptionalId } from 'mongodb'
+import { Collection } from 'mongodb'
 
 
 export async function updateLastUpdatedBlock(collection: Collection<Document>, block: number): Promise<void> {
@@ -11,7 +11,6 @@ export async function updateLastUpdatedBlock(collection: Collection<Document>, b
                 }
             }
         );
-        console.log("updateLastUpdatedBlock", result);
         if (!result) {
             await collection.insertOne({
                 id: "CHAIN_STATE",
@@ -26,7 +25,6 @@ export async function updateLastUpdatedBlock(collection: Collection<Document>, b
 export async function getLastSyncedBlock(collection: Collection<Document>): Promise<number> {
     try {
         const result: any = await collection.findOne({ id: "CHAIN_STATE" });
-        console.log("getLastSyncedBlock", result);
         return result?.lastSyncedBlock ?? 0;
     } catch (error) {
         console.error(error);

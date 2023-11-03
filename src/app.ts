@@ -8,7 +8,7 @@ import { startStreamService } from './streamer';
 import { fetchLogs } from './routes/getLogs';
 import { healthCheck } from './routes/healthCheck';
 import "./constant"
-import { initializeMongoDB } from './db/mongoDB/mongodb';
+import { initializeMongoDB } from './db/mongoDB';
 require("dotenv").config({ path: path.resolve(__dirname, '../.env') });
 
 const app = express();
@@ -32,11 +32,11 @@ app.use('/', healthCheck);
 async function main() {
     try {
         // await initializeDB();
-        const db = await initializeMongoDB();
+        await initializeMongoDB();
         app.listen(PORT, () => {
             logger.info(`Server is running on http://localhost:${PORT}`);
         });
-        startStreamService(db);
+        startStreamService();
     } catch (error) {
         logger.error(`Error occurred - ${error}`);
     }

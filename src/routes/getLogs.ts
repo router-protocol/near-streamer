@@ -1,6 +1,8 @@
 import { Router, Request, Response } from 'express';
-import { EventLogActions } from '../db/mongoDB/actions/eventLog';
+// import { EventLogActions } from '../db/mongoDB/actions/eventLog';
 import logger from '../logger';
+import { getLogsFromBlockHeightToBlockHeight } from '../db/mongoDB/action/eventLog';
+import { getCollection } from '../db/mongoDB';
 
 const fetchLogs = Router();
 
@@ -22,7 +24,8 @@ fetchLogs.get('/fetch-logs', async (req: Request, res: Response) => {
         // @ts-ignore
         const endBlock = (parseInt(reqEndBlock)) ?? 0;
         logger.info(`Fetching logs from block ${startBlock} to ${endBlock}`);
-        const result = await new EventLogActions().getLogsFromBlockHeightToBlockHeight(startBlock, endBlock);
+        const eventlogscollection = await getCollection("eventlogs");
+        const result = await getLogsFromBlockHeightToBlockHeight(eventlogscollection, startBlock, endBlock);
         res.json(result);
     } catch (error) {
         console.error('Error fetching data:', error);

@@ -1,35 +1,33 @@
-import mongoose from "mongoose";
-// import { dbEnvironment, NODE_ENV } from "../../config";
-// import { CrossChainStateCollection, TransactionCollection } from "../../data-access-layer";
-// import { CrossChainState } from "./models/CrossChainState.model";
-import logger from "../../logger";
-import { MONGO_DB_URI } from "../../constant";
+import { Collection, Db, MongoClient } from 'mongodb'
+import { MONGO_DB_URI } from '../../constant';
+import logger from '../../logger';
 
-/**
- * Mongoose Connection
- **/
+// Connection URL
+const client = new MongoClient(MONGO_DB_URI);
 
-export const initializeMongoDB = async () => {
+// Database Name
+const dbName = 'near-streamer';
+
+export let DBInstance: Db;
+
+async function initializeMongoDB(): Promise<Db> {
     try {
         logger.info(`Connecting to MongoDB - ${MONGO_DB_URI}`);
-        return await mongoose.connect(
-            MONGO_DB_URI,
-            {
-                dbName: "near-streamer",
-                bufferCommands: false, // Disable buffering to set a higher timeout
-                family: 4,
-
-            }
-        ).then(() => {
-            logger.info("Connected to MongoDB");
-        }
-        ).catch((err) => {
-            logger.error(`Error occurred - ${err}`);
-            process.exit(1);
-        });
+        await client.connect();
+        logger.info(`Connected to MongoDB Server`);
+        DBInstance = client.db(dbName);
+        return DBInstance;
     } catch (error) {
         logger.error(`Error occurred - ${error}`);
     }
-};
+}
 
-export * from "./models";
+async function getCollection(collectionName: string): Promise<Collection<Document>> {
+    try {
+        return DBInstance.collection(collectionName);
+    } catch (error) {
+        logger.error(`Error occurred getting collection ${collectionName} - ${error}`);
+    }
+}
+
+export { initializeMongoDB, getCollection };

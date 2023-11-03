@@ -1,6 +1,6 @@
 import { Collection, Db, MongoClient, OptionalId } from 'mongodb'
 import { IEventLog } from '../types';
-import { getEventId } from '../../../../utils';
+import { getEventId } from '../../../utils';
 
 export async function putNewEventLog(collection: Collection<Document>, eventLog: IEventLog): Promise<void> {
     try {
