@@ -8,7 +8,9 @@ import { startStreamService } from './streamer';
 import { fetchLogs } from './routes/getLogs';
 import { healthCheck } from './routes/healthCheck';
 import "./constant"
-import { initializeMongoDB } from './db/mongoDB';
+import { getCollection, initializeMongoDB } from './db/mongoDB';
+import { CONTRACTS_TO_TRACK } from './constant';
+import { getAllBlocklogsAndUpdate } from './db/mongoDB/action/blockLog';
 require("dotenv").config({ path: path.resolve(__dirname, '../.env') });
 
 const app = express();
@@ -26,17 +28,28 @@ app.use('/', fetchLogs);
 app.use('/', healthCheck);
 
 
+// Checks for --custom and if it has a value
+const customIndex = process.argv.indexOf('--custom');
+let customValue;
 
+if (customIndex > -1) {
+    // Retrieve the value after --custom
+    customValue = process.argv[customIndex + 1];
+}
+
+const custom = (customValue || 'default');
 
 
 async function main() {
     try {
-        // await initializeDB();
         await initializeMongoDB();
         app.listen(PORT, () => {
             logger.info(`Server is running on http://localhost:${PORT}`);
         });
-        startStreamService();
+        console.log("custom", custom)
+        if (custom !== "only-server") {
+            startStreamService();
+        }
     } catch (error) {
         logger.error(`Error occurred - ${error}`);
     }

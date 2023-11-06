@@ -3,19 +3,26 @@ import { Collection } from 'mongodb'
 
 export async function updateLastUpdatedBlock(collection: Collection<Document>, block: number): Promise<void> {
     try {
-        const result = await collection.findOneAndUpdate(
-            { id: "CHAIN_STATE" },
-            {
-                $set: {
-                    lastSyncedBlock: block
-                }
-            }
+        const result: any = await collection.findOne(
+            { id: "CHAIN_STATE" }
         );
         if (!result) {
             await collection.insertOne({
                 id: "CHAIN_STATE",
                 lastSyncedBlock: block,
             } as any);
+        } else {
+            if (result?.lastSyncedBlock > block) {
+                return;
+            }
+            await collection.updateOne(
+                { id: "CHAIN_STATE" },
+                {
+                    $set: {
+                        lastSyncedBlock: block,
+                    },
+                }
+            );
         }
     } catch (error) {
         console.error(error);

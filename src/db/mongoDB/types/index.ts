@@ -1,6 +1,6 @@
 import { Document } from "mongodb";
 
-export interface IEventLog {
+export interface IBlocklog {
     height: number;
     timestamp: number;
     gasBrunt: number;

@@ -1,10 +1,9 @@
 import { startStream, types } from "near-lake-framework";
-import { NEAR_TESTNET_CONFIG as NEAR_CONFIG } from "./constant";
+import { CONTRACTS_TO_TRACK, LOOK_BACK_BLOCKS, NEAR_TESTNET_CONFIG as NEAR_CONFIG } from "./constant";
 import logger from "./logger";
 import { getLastSyncedBlock, updateLastUpdatedBlock } from "./db/mongoDB/action/chainState";
-import { DBInstance, getCollection } from "./db/mongoDB/";
-import { Collection, DBRef, Db } from "mongodb";
-import { putNewEventLog } from "./db/mongoDB/action/eventLog";
+import { getCollection } from "./db/mongoDB/";
+import { putNewBlocklog } from "./db/mongoDB/action/blockLog";
 
 // const FUNDS_PAID = "funds_paid";
 // const FUNDS_PAID_WITH_MESSAGE = "funds_paid_with_message";
@@ -43,12 +42,19 @@ const lakeConfig: types.LakeConfig = {
 
 // const chainStateCollObj = new IndividualChainStateCollection();
 // const chainStateActions = new ChainStateActions();
-// const eventLogActions = new EventLogActions();
+// const blocklogActions = new BlocklogActions();
 
 export async function handleStreamerMessage(
     streamerMessage: types.StreamerMessage
 ): Promise<void> {
-    const eventlogcollection = await getCollection("eventlogs");
+    const collections = await Promise.all(CONTRACTS_TO_TRACK.map((key) => {
+        return getCollection("blocklogs_" + key);
+    }
+    ));
+    const contractAndCollection = CONTRACTS_TO_TRACK.reduce((accumulator, key, index) => {
+        accumulator[key] = collections[index];
+        return accumulator;
+    }, {});;
     const chainStatecollection = await getCollection("chainstates");
 
     logger.info(
@@ -57,18 +63,17 @@ export async function handleStreamerMessage(
         )}`
     );
     try {
+        const validLogs = new Map<string, number>(
+            CONTRACTS_TO_TRACK.map((contract) => [contract, 0])
+        );
         for (let k = 0; k < streamerMessage.shards.length; k++) {
             const shard = streamerMessage.shards[k];
             for (let j = 0; j < shard.receiptExecutionOutcomes.length; j++) {
 
                 const rxExOutcome = shard.receiptExecutionOutcomes[j];
                 if (
-                    rxExOutcome.executionOutcome.outcome.executorId.toLowerCase() ===
-                    NEAR_CONFIG.assetForwarder.toLowerCase() ||
-                    rxExOutcome.executionOutcome.outcome.executorId.toLowerCase() ===
-                    NEAR_CONFIG.assetBridge.toLowerCase()
+                    CONTRACTS_TO_TRACK.includes(rxExOutcome.receipt.receiverId.toLowerCase())
                 ) {
-                    const validLogs: string[] = []
                     for (
                         let i = 0;
                         i < rxExOutcome.executionOutcome.outcome.logs.length;
@@ -79,29 +84,25 @@ export async function handleStreamerMessage(
                         const parsedLog = JSON.parse(trimmedLog);
                         if (EVENTS_TO_TRACK.includes(parsedLog.event.toLowerCase())) {
                             logger.info(parsedLog.event.toUpperCase())
-                            validLogs.push(log);
+                            validLogs.set(
+                                rxExOutcome.receipt.receiverId.toLowerCase(),
+                                validLogs.get(rxExOutcome.receipt.receiverId.toLowerCase())! + 1
+                            );
                         }
                     }
-                    if (validLogs.length > 0) {
-                        const response = await putNewEventLog(eventlogcollection,
-                            {
-                                blockHash: streamerMessage.block.header.hash,
-                                height: streamerMessage.block.header.height,
-                                receipt: {
-                                    predecessorId: rxExOutcome.receipt.predecessorId,
-                                    receiverId: rxExOutcome.receipt.receiverId,
-                                    receiptId: rxExOutcome.receipt.receiptId,
-                                },
-                                shardId: shard.shardId,
-                                events: validLogs,
-                                gasBrunt: rxExOutcome.executionOutcome.outcome.gasBurnt,
-                                timestamp:
-                                    streamerMessage.block.header.timestamp,
-                            }
-                        );
-                        logger.info(`Event Pushed in DB`);
-                    }
+
                 }
+            }
+        }
+        for (let [key, value] of validLogs) {
+            if (value > 0) {
+                const response = await putNewBlocklog(contractAndCollection[key],
+                    {
+                        height: streamerMessage.block.header.height,
+                        blockDump: streamerMessage
+                    }
+                );
+                logger.info(`Block Pushed in DB`);
             }
         }
         await updateLastUpdatedBlock(
@@ -120,11 +121,10 @@ export async function handleStreamerMessage(
 
 export const startStreamService = async () => {
     try {
-        const eventlogcollection = await getCollection("eventlogs");
         const chainStatecollection = await getCollection("chainstates");
         const lastSyncedBlock = await getLastSyncedBlock(chainStatecollection);
         const startBlock = lastSyncedBlock
-            ? lastSyncedBlock + 1
+            ? lastSyncedBlock - LOOK_BACK_BLOCKS
             : lakeConfig.startBlockHeight;
         const latestLakeConfig = { ...lakeConfig, startBlockHeight: startBlock };
         logger.info(`Starting stream from block ${startBlock}`);

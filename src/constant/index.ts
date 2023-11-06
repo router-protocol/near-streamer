@@ -14,5 +14,10 @@ export const NEAR_TESTNET_CONFIG = {
     blocksPreloadPoolSize: 1,
     nearExplorerApi: "https://api-testnet.nearblocks.io",
 };
-
+export const CONTRACTS_TO_TRACK = [
+    "asset_forwarder_testnet.router_protocol.testnet",
+    "gateway-1692892905501.router_protocol.testnet"
+]
 export const MONGO_DB_URI = process.env.MONGO_DB_URI ?? "mongodb://127.0.0.1:27017/";
+
+export const LOOK_BACK_BLOCKS = 100

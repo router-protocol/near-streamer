@@ -1,5 +1,5 @@
-import { IEventLog } from "../db/mongoDB/types";
+import { IBlocklog } from "../db/mongoDB/types";
 
-export const getEventId = (eventLog: IEventLog) => {
-    return eventLog.height.toString() + eventLog.shardId.toString() + eventLog.receipt.receiptId.toString();
+export const getEventId = (blocklog: IBlocklog) => {
+    return blocklog.height.toString() + blocklog.shardId.toString() + blocklog.receipt.receiptId.toString();
 }
