@@ -35,7 +35,6 @@ const EVENTS_TO_TRACK = ["funds_paid",
     "funds_deposited",
     "funds_deposited_with_message",
     "deposit_info_update"]
-
 const lakeConfig: types.LakeConfig = {
     s3BucketName: NEAR_CONFIG.s3BucketName,
     s3RegionName: NEAR_CONFIG.s3RegionName,
@@ -127,7 +126,8 @@ export async function handleStreamerMessage(
 
 export const startStreamService = async () => {
     try {
-        CONTRACTS_TO_TRACK = await fetchContractsToTrack();
+        const contractsToTrack = await fetchContractsToTrack();
+        CONTRACTS_TO_TRACK = [...contractsToTrack, 'asset-bridge.i-swap.testnet']
         if (CONTRACTS_TO_TRACK.length === 0) {
             logger.error("No contracts to track")
             return;
