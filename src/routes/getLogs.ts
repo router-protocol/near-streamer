@@ -3,7 +3,8 @@ import { Router, Request, Response } from 'express';
 import logger from '../logger';
 import { getLogsFromBlockHeightToBlockHeight } from '../db/mongoDB/action/blockLog';
 import { getCollection } from '../db/mongoDB';
-import { CONTRACTS_TO_TRACK } from '../constant';
+import { CONTRACTS_TO_TRACK } from '../streamer';
+import { keysToSnakeCase } from '../utils/caseConverter';
 
 const fetchLogs = Router();
 
@@ -26,17 +27,19 @@ fetchLogs.get('/fetch-logs', async (req: Request, res: Response) => {
         // @ts-ignore
         const startBlock = (parseInt(reqStartBlock)) ?? 0;
         // @ts-ignore
-        const endBlock = (parseInt(reqEndBlock)) ?? undefined;
+        let limit = (parseInt(reqLimit)) ?? 1000;
+        if (limit > 10000) {
+            limit = 10000;
+        }
         // @ts-ignore
-        const limit = (parseInt(reqLimit)) ?? undefined;
+        const endBlock = (parseInt(reqEndBlock)) ?? startBlock + limit;
         logger.info(`Fetching logs from block ${startBlock} to ${endBlock}`);
         const blocklogscollection = await getCollection("blocklogs_" + reqContract);
         const result = await getLogsFromBlockHeightToBlockHeight(blocklogscollection, {
             startBlock,
             endBlock,
-            limit
         });
-        res.json(result);
+        res.json(keysToSnakeCase(result));
     } catch (error) {
         console.error('Error fetching data:', error);
         res.status(500).json({ success: false, message: 'Internal Server Error' });

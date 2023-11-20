@@ -1,9 +1,10 @@
 import { startStream, types } from "near-lake-framework";
-import { CONTRACTS_TO_TRACK, LOOK_BACK_BLOCKS, NEAR_TESTNET_CONFIG as NEAR_CONFIG } from "./constant";
+import { LOOK_BACK_BLOCKS, NEAR_TESTNET_CONFIG as NEAR_CONFIG } from "./constant";
 import logger from "./logger";
 import { getLastSyncedBlock, updateLastUpdatedBlock } from "./db/mongoDB/action/chainState";
 import { getCollection } from "./db/mongoDB/";
 import { putNewBlocklog } from "./db/mongoDB/action/blockLog";
+import { fetchContractsToTrack } from "./utils";
 
 // const FUNDS_PAID = "funds_paid";
 // const FUNDS_PAID_WITH_MESSAGE = "funds_paid_with_message";
@@ -18,6 +19,8 @@ import { putNewBlocklog } from "./db/mongoDB/action/blockLog";
 // const FUNDS_DEPOSITED = "funds_deposited"
 // const FUNDS_DEPOSITED_WITH_MESSAGE = "funds_deposited_with_message"
 // const DEPOSIT_INFO_UPDATE = "deposit_info_update"
+
+export let CONTRACTS_TO_TRACK: string[]
 
 const EVENTS_TO_TRACK = ["funds_paid",
     "funds_paid_with_message",
@@ -80,10 +83,13 @@ export async function handleStreamerMessage(
                         i++
                     ) {
                         const log = rxExOutcome.executionOutcome.outcome.logs[i];
+                        if (!log.includes("EVENT_JSON:")) {
+                            continue
+                        }
                         const trimmedLog = log.split("EVENT_JSON:")[1];
                         const parsedLog = JSON.parse(trimmedLog);
                         if (EVENTS_TO_TRACK.includes(parsedLog.event.toLowerCase())) {
-                            logger.info(parsedLog.event.toUpperCase())
+                            logger.info(parsedLog.event.toUpperCase(), streamerMessage.block.header.height)
                             validLogs.set(
                                 rxExOutcome.receipt.receiverId.toLowerCase(),
                                 validLogs.get(rxExOutcome.receipt.receiverId.toLowerCase())! + 1
@@ -112,7 +118,7 @@ export async function handleStreamerMessage(
         logger.info(`Updating last block:${streamerMessage.block.header.height}`);
     } catch (error) {
         logger.error(error);
-        logger.error(`${NEAR_CONFIG.networkId} error in Block # Shards: ${error}`);
+        logger.error(`${NEAR_CONFIG.networkId} error in Block # Shards: ${streamerMessage.block.header.height}`);
         //     await sendSlackMessage(
         //         `handleStreamerMessage error - ${JSON.stringify(error)}`
         //     );
@@ -121,6 +127,13 @@ export async function handleStreamerMessage(
 
 export const startStreamService = async () => {
     try {
+        CONTRACTS_TO_TRACK = await fetchContractsToTrack();
+        if (CONTRACTS_TO_TRACK.length === 0) {
+            logger.error("No contracts to track")
+            return;
+        } else {
+            logger.info(`Tracking ${CONTRACTS_TO_TRACK.length} contracts`)
+        }
         const chainStatecollection = await getCollection("chainstates");
         const lastSyncedBlock = await getLastSyncedBlock(chainStatecollection);
         const startBlock = lastSyncedBlock
@@ -138,3 +151,4 @@ export const startStreamService = async () => {
 // if (ENABLE_NEAR_REST_SYNC) {
 //     setTimeout(() => startStreamService(), 5000);
 // }
+// "timestamp":1699429241208249000,"timestampNanosec":"1699429241208248995"

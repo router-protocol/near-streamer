@@ -1,15 +1,24 @@
-version: '1.2'
-
+version: '3.3'
 services:
   streamer:
     build: .
+    volumes:
+      - ~/.aws:/root/.aws/
     environment:
-      - MONGO_DB_URI=mongodb://mongodb:27017/
+      - MONGO_DB_URI=mongodb://mongodb:27018/
+      - NETWORK=testnet
+      - START_BLOCK=144880410
+      - PORT=6901
+      - ALERTER_ACTIVE=true
+      - SLACK_WEBHOOK_URL=https://hooks.slack.com/services/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
     ports:
-      - '6900:6900'
+      - '6901:6901'
     depends_on:
       - mongodb
   mongodb:
     image: mongo:6-jammy
+    command: mongod --port 27018
     ports:
-      - '27017:27017'
+      - '27018:27018'
+    volumes:
+      - ./db-alpha:/data/db:rw

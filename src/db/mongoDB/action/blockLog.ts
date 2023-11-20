@@ -1,5 +1,5 @@
 import { Collection, ObjectId, } from 'mongodb'
-import { IBlocklog } from '../types';
+// import { IBlocklog } from '../types';
 import { getEventId } from '../../../utils';
 import { keysToSnakeCase } from '../../../utils/caseConverter';
 
@@ -37,7 +37,7 @@ export async function putNewBlocklog(collection: Collection<Document>, blocklog:
     }
 }
 
-export async function getAllBlocklogs(collection: Collection<Document>): Promise<IBlocklog[]> {
+export async function getAllBlocklogs(collection: Collection<Document>): Promise<any[]> {
     try {
         const result = await collection.find({}).toArray();
         return result as any;
@@ -46,7 +46,7 @@ export async function getAllBlocklogs(collection: Collection<Document>): Promise
         return [];
     }
 }
-export async function getAllBlocklogsAndUpdate(collection: Collection<Document>): Promise<IBlocklog[]> {
+export async function getAllBlocklogsAndUpdate(collection: Collection<Document>): Promise<any[]> {
     try {
         const result = await collection.find({}).toArray();
         if (result.length != 0) {
@@ -73,10 +73,10 @@ export async function getAllBlocklogsAndUpdate(collection: Collection<Document>)
 }
 
 export async function getLogsFromBlockHeightToBlockHeight(collection: Collection<Document>, options: {
-    startBlock: number, endBlock?: number, limit?: number
-}): Promise<IBlocklog[]> {
+    startBlock: number, endBlock?: number
+}): Promise<any[]> {
     try {
-        const { startBlock, endBlock, limit } = options;
+        const { startBlock, endBlock } = options;
         const filter = endBlock ? {
             _id: { $gte: startBlock, $lte: endBlock }
         } : {
@@ -84,10 +84,8 @@ export async function getLogsFromBlockHeightToBlockHeight(collection: Collection
         }
         // @ts-ignore
         const result = await collection.find(filter, {
-            limit,
             sort: { _id: 1 }
         }).toArray();
-        console.log(result, collection.collectionName)
         return result as any;
     } catch (error) {
         console.error(error);

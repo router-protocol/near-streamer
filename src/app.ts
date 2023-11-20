@@ -8,9 +8,9 @@ import { startStreamService } from './streamer';
 import { fetchLogs } from './routes/getLogs';
 import { healthCheck } from './routes/healthCheck';
 import "./constant"
-import { getCollection, initializeMongoDB } from './db/mongoDB';
-import { CONTRACTS_TO_TRACK } from './constant';
-import { getAllBlocklogsAndUpdate } from './db/mongoDB/action/blockLog';
+import { DBInstance, initializeMongoDB } from './db/mongoDB';
+import { healthCheckService } from './utils/healthCheckService';
+import { ALERTER_ACTIVE } from './constant';
 require("dotenv").config({ path: path.resolve(__dirname, '../.env') });
 
 const app = express();
@@ -55,3 +55,17 @@ async function main() {
     }
 }
 main();
+let continousAlerts = 1;
+if (ALERTER_ACTIVE) {
+    setInterval(async () => {
+        // do health check every 5 minutes
+        if (!DBInstance) {
+            const alerted = await healthCheckService();
+            if (alerted) {
+                continousAlerts++;
+            } else {
+                continousAlerts = 1;
+            }
+        }
+    }, continousAlerts * 5 * 60 * 1000);
+}
