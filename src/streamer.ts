@@ -127,7 +127,7 @@ export async function handleStreamerMessage(
 export const startStreamService = async () => {
     try {
         const contractsToTrack = await fetchContractsToTrack();
-        CONTRACTS_TO_TRACK = [...contractsToTrack, 'asset-bridge.i-swap.testnet']
+        CONTRACTS_TO_TRACK = [...contractsToTrack]
         if (CONTRACTS_TO_TRACK.length === 0) {
             logger.error("No contracts to track")
             return;
