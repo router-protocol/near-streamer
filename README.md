@@ -33,5 +33,6 @@ Update the following environment variables in the `docker-compose.yml` file:
 - SLACK_WEBHOOK_URL=https://hooks.slack.com/services/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
 ```
 `MONGO_DB_URI` is the URI of the MongoDB instance. We  are running MongoDB locally, you have to use port defined in mongodb. `NETWORK` either will be testnet or alpha-devnet. `START_BLOCK` is block to be started from. `PORT` to be exposed. `ALERTER_ACTIVE` and `SLACK_WEBHOOK_URL` is for slack health alerter.
-1. **Run Docker Compose**
+
+6. **Run Docker Compose**
 `docker-compose up -d`
