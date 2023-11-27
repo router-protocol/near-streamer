@@ -3,7 +3,7 @@ services:
   streamer:
     image: docker.io/joydeep/near-streamer:4.0
     volumes:
-      - ~/.aws:/root/.aws/
+      - .aws:/root/.aws/
     environment:
       - MONGO_DB_URI=mongodb://mongodb:27018/
       - NETWORK=testnet
