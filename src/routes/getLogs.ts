@@ -11,12 +11,18 @@ const fetchLogs = Router();
 fetchLogs.get('/fetch-logs', async (req: Request, res: Response) => {
     try {
         // sanity check for startBlock and endBlock
-        const reqStartBlock = req.query.startBlock
-        const reqEndBlock = req.query.endBlock
-        const reqLimit = req.query.numOfBlocks
+        const reqStartBlock = Number(req.query.startBlock)
+        const reqEndBlock = Number(req.query.endBlock)
+        const reqLimit = Number(req.query.numOfBlocks)
         const reqContract = req.query.contract
-        if (isNaN(Number(reqStartBlock))) {
+        // start block is a number
+        if (isNaN(reqStartBlock)) {
             res.status(400).json({ success: false, message: 'Invalid startBlock' });
+            return;
+        }
+        // endblock or limit is a number
+        if (isNaN(reqLimit) && isNaN(reqEndBlock)) {
+            res.status(400).json({ success: false, message: 'Invalid limit or end block' });
             return;
         }
 
@@ -24,15 +30,13 @@ fetchLogs.get('/fetch-logs', async (req: Request, res: Response) => {
             res.status(400).json({ success: false, message: 'Invalid Contract Address' });
             return;
         }
-        // @ts-ignore
-        const startBlock = (parseInt(reqStartBlock)) ?? 0;
-        // @ts-ignore
-        let limit = (parseInt(reqLimit)) ?? 1000;
+        const startBlock = reqStartBlock;
+        let limit = isNaN(reqLimit) ? 1000 : reqLimit;
         if (limit > 10000) {
             limit = 10000;
         }
-        // @ts-ignore
-        const endBlock = (parseInt(reqEndBlock)) ?? startBlock + limit;
+        let endBlock = isNaN(reqEndBlock) ? startBlock + limit : reqEndBlock;
+
         logger.info(`Fetching logs from block ${startBlock} to ${endBlock}`);
         const blocklogscollection = await getCollection("blocklogs_" + reqContract);
         const result = await getLogsFromBlockHeightToBlockHeight(blocklogscollection, {
