@@ -5,7 +5,9 @@
   "author": "Joydeep Singha",
   "license": "MIT",
   "scripts": {
-    "start": "rm -rf ./dist/ && tsc && node ./dist/app.js --exec babel-node -e js",
+    "start": "node ./dist/app.js --exec babel-node -e js",
+    "build": "rm -rf ./dist/ && tsc",
+    "build-and-start": "npm run build && npm start",
     "dev": "nodemon ./src/app.ts",
     "codegen": "graphql-codegen --config codegen.ts"
   },

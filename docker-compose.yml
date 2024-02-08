@@ -1,15 +1,16 @@
 version: '3.3'
 services:
   streamer:
-    image: docker.io/joydeep/near-streamer:4.0
+    image: docker.io/joydeep/near-streamer
     volumes:
       - .aws:/root/.aws/
     environment:
       - MONGO_DB_URI=mongodb://mongodb:27018/
-      - NETWORK=testnet
-      - START_BLOCK=146791266
+      - NETWORK=devnet-alpha
+      - START_BLOCK=156292210
       - PORT=6901
       - ALERTER_ACTIVE=true
+      - PRUNE_AFTER=60
       - SLACK_WEBHOOK_URL=https://hooks.slack.com/services/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
     ports:
       - '6901:6901'

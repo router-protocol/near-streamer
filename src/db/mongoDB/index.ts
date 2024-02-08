@@ -1,6 +1,7 @@
-import { Collection, Db, MongoClient } from 'mongodb'
+import { Collection, Db, Document, MongoClient } from 'mongodb'
 import { MONGO_DB_URI } from '../../constant';
 import logger from '../../logger';
+import { createTTLIndex } from './action/blockLog';
 
 // Connection URL
 const client = new MongoClient(MONGO_DB_URI);
@@ -24,6 +25,8 @@ async function initializeMongoDB(): Promise<Db> {
 
 async function getCollection(collectionName: string): Promise<Collection<Document>> {
     try {
+        const collection = DBInstance.collection(collectionName);
+        createTTLIndex(collection);
         return DBInstance.collection(collectionName);
     } catch (error) {
         logger.error(`Error occurred getting collection ${collectionName} - ${error}`);

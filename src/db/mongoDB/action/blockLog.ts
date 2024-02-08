@@ -2,6 +2,9 @@ import { Collection, ObjectId, } from 'mongodb'
 // import { IBlocklog } from '../types';
 import { getEventId } from '../../../utils';
 import { keysToSnakeCase } from '../../../utils/caseConverter';
+import { Document } from 'mongodb';
+import { PRUNE_AFTER } from '../../../constant';
+import logger from '../../../logger';
 
 export async function putNewBlocklog(collection: Collection<Document>, blocklog: {
     height: number,
@@ -10,24 +13,13 @@ export async function putNewBlocklog(collection: Collection<Document>, blocklog:
     try {
         const findResult = await collection.find({ _id: new ObjectId(blocklog.height) }).toArray();
         if (findResult.length === 0) {
-            // const data = {
-            //     // id,
-            //     blockHash: blocklog.blockHash,
-            //     height: blocklog.height,
-            //     shardId: blocklog.shardId,
-            //     events: blocklog.events,
-            //     timestamp: blocklog.timestamp,
-            //     gas_burnt: blocklog.gasBrunt,
-            //     receipt: {
-            //         predecessor_id: blocklog.receipt.predecessorId,
-            //         receiver_id: blocklog.receipt.receiverId,
-            //         receipt_id: blocklog.receipt.receiptId,
-            //     }
-            // } as any
+            const createdAt = new Date();
+            logger.info("createdAt", createdAt);
             const data = {
                 _id: blocklog.height,
-                blockDump: blocklog.blockDump
-            } as any
+                blockDump: blocklog.blockDump,
+                createdAt // the current date and time
+            } as Document;
             // const result = await collection.insertOne({} as OptionalId<Document>);
             await collection.insertOne(data);
         }
@@ -35,6 +27,10 @@ export async function putNewBlocklog(collection: Collection<Document>, blocklog:
     } catch (error) {
         console.error(error);
     }
+}
+
+export async function createTTLIndex(collection: Collection<Document>): Promise<void> {
+    await collection.createIndex({ "createdAt": 1 }, { expireAfterSeconds: PRUNE_AFTER });
 }
 
 export async function getAllBlocklogs(collection: Collection<Document>): Promise<any[]> {

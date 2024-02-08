@@ -3,7 +3,7 @@ import { LOOK_BACK_BLOCKS, NEAR_TESTNET_CONFIG as NEAR_CONFIG } from "./constant
 import logger from "./logger";
 import { getLastSyncedBlock, updateLastUpdatedBlock } from "./db/mongoDB/action/chainState";
 import { getCollection } from "./db/mongoDB/";
-import { putNewBlocklog } from "./db/mongoDB/action/blockLog";
+import { createTTLIndex, putNewBlocklog } from "./db/mongoDB/action/blockLog";
 import { fetchContractsToTrack } from "./utils";
 
 // const FUNDS_PAID = "funds_paid";
@@ -53,6 +53,7 @@ export async function handleStreamerMessage(
         return getCollection("blocklogs_" + key);
     }
     ));
+
     const contractAndCollection = CONTRACTS_TO_TRACK.reduce((accumulator, key, index) => {
         accumulator[key] = collections[index];
         return accumulator;

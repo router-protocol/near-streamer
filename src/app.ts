@@ -5,7 +5,7 @@ import "./streamer"
 import logger from './logger';
 // import { initializeDB } from './db/dbConnector';
 import { startStreamService } from './streamer';
-import { fetchLogs } from './routes/getLogs';
+import { fetchLogs } from './routes/fetchLogs';
 import { healthCheck } from './routes/healthCheck';
 import "./constant"
 import { DBInstance, initializeMongoDB } from './db/mongoDB';

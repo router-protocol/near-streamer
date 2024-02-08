@@ -1,4 +1,4 @@
-import { Collection } from 'mongodb'
+import { Collection, Document } from 'mongodb'
 
 
 export async function updateLastUpdatedBlock(collection: Collection<Document>, block: number): Promise<void> {

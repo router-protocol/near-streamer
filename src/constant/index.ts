@@ -26,6 +26,6 @@ export const CHAIN_ID = process.env.CHAIN_ID ?? "near-testnet";
 export const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL;
 export const NETWORK = process.env.NETWORK ?? "testnet";
 export const LCD = LCDs[NETWORK] ?? "";
-
+export const PRUNE_AFTER = parseInt(process.env.PRUNE_AFTER ?? "60000");
 export const LOOK_BACK_BLOCKS = 100
 export const ALERTER_ACTIVE = process.env.ALERTER_ACTIVE === "true" ?? false;
