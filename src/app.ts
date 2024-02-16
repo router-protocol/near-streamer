@@ -21,7 +21,7 @@ app.use(cors());
 
 
 app.get('/', (req: Request, res: Response) => {
-    res.send('Hello, Is this working?');
+    res.send('Stream service is running, do /health for health check');
 });
 
 app.use('/', fetchLogs);
