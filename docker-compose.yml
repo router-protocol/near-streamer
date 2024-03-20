@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   streamer:
-    image: joydeep/near-streamer
+    image: nitro/near-streamer
     volumes:
       - .aws:/root/.aws/
     environment:

@@ -33,7 +33,7 @@ Update the following environment variables in the `docker-compose.yml` file:
 `MONGO_DB_URI` is the URI of the MongoDB instance. We  are running MongoDB locally, you have to use port defined in mongodb. `NETWORK` either will be mainnet, testnet or alpha-devnet. `START_BLOCK` is block to be started from. `PORT` to be exposed. `ALERTER_ACTIVE` and `SLACK_WEBHOOK_URL` is for slack health alerter. `PRUNE_AFTER` is the time in seconds after which the db data will be pruned.
 
 5. **Build Docker Image**
-`docker build -t near-streamer .`
+`docker build . -t nitro/near-streamer`
 
 6. **Run Docker Compose**
 `docker-compose up -d`
