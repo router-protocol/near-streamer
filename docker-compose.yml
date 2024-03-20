@@ -1,13 +1,13 @@
 version: '3.3'
 services:
   streamer:
-    image: docker.io/joydeep/near-streamer
+    image: joydeep/near-streamer
     volumes:
       - .aws:/root/.aws/
     environment:
       - MONGO_DB_URI=mongodb://mongodb:27018/
-      - NETWORK=devnet-alpha
-      - START_BLOCK=156292210
+      - NETWORK=mainnet
+      - START_BLOCK=114756144
       - PORT=6901
       - ALERTER_ACTIVE=true
       - PRUNE_AFTER=604800

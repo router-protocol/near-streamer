@@ -1,4 +1,4 @@
-import { CHAIN_ID, LCD } from "../constant";
+import { CHAIN_ID, LCD, NEAR_CONFIG } from "../constant";
 import logger from "../logger";
 
 export const getEventId = (blocklog: any) => {
@@ -9,7 +9,7 @@ export const getEventId = (blocklog: any) => {
 export const fetchContractsToTrack = async (): Promise<string[]> => {
     logger.info("Fetching contracts to track")
     if (LCD === "") {
-        throw new Error("LCD is not set")
+        return [NEAR_CONFIG.assetBridge, NEAR_CONFIG.gateway]
     }
     return fetch(LCD).then((res) => {
         return res.json();
