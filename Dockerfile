@@ -7,6 +7,7 @@ COPY yarn.lock ./
 COPY . .
 RUN yarn install
 RUN yarn build
+
 FROM gcr.io/distroless/nodejs20-debian11
 WORKDIR /app
 COPY --from=builder /app/dist ./dist

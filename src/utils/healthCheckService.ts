@@ -1,4 +1,4 @@
-import { NEAR_TESTNET_CONFIG, NETWORK } from "../constant";
+import { NEAR_CONFIG, NETWORK } from "../constant";
 import { getCollection } from "../db/mongoDB";
 import { getLastSyncedBlock } from "../db/mongoDB/action/chainState";
 import logger from "../logger";
@@ -10,7 +10,7 @@ export const healthCheckService: () => Promise<boolean> = async () => {
 
     try {
 
-        const nearConnection = await connect(NEAR_TESTNET_CONFIG);
+        const nearConnection = await connect(NEAR_CONFIG);
         const latestBlockHeight: number = await nearConnection.connection.provider.status().then((status) => {
             return status.sync_info.latest_block_height;
         });
