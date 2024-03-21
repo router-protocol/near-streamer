@@ -17,10 +17,10 @@ Ensure that you have Docker, Node.js, and Yarn installed on your machine. If not
    aws_access_key_id = EXAMEXAMPLEEXAMPLE
    aws_secret_access_key = EXAMPLEKEYEXAMPLEKEYEXAMPLEKEY
    ```
-   Save this file as `./.aws/credentials`
+   Save this file as `./aws_credentials/credentials`
 
-4. **Modify `docker-compose.yml`**
-Update the following environment variables in the `docker-compose.yml` file:
+4. **Create `.env` file**
+Update the following environment variables from `.env.example` file:
 ```yaml
 - MONGO_DB_URI=mongodb://mongodb:27018/
 - NETWORK=testnet
@@ -28,12 +28,9 @@ Update the following environment variables in the `docker-compose.yml` file:
 - PORT=6901
 - ALERTER_ACTIVE=true
 - PRUNE_AFTER=604800
-- SLACK_WEBHOOK_URL=https://hooks.slack.com/services/FOR/YOUR/SLACK/WEBHOOK
+- SLACK_WEBHOOK_URL=**https**://hooks.slack.com/services/FOR/YOUR/SLACK/WEBHOOK
 ```
-`MONGO_DB_URI` is the URI of the MongoDB instance. We  are running MongoDB locally, you have to use port defined in mongodb. `NETWORK` either will be mainnet, testnet or alpha-devnet. `START_BLOCK` is block to be started from. `PORT` to be exposed. `ALERTER_ACTIVE` and `SLACK_WEBHOOK_URL` is for slack health alerter. `PRUNE_AFTER` is the time in seconds after which the db data will be pruned.
+`MONGO_DB_URI` is the URI of the MongoDB instance. We are running MongoDB locally, you have to use port defined in mongodb. `NETWORK` either will be mainnet, testnet or alpha-devnet. `START_BLOCK` is block to be started from. `PORT` to be exposed. `ALERTER_ACTIVE` and `SLACK_WEBHOOK_URL` is for slack health alerter. `PRUNE_AFTER` is the time in seconds after which the db data will be pruned.
 
-5. **Build Docker Image**
-`docker build . -t nitro/near-streamer`
-
-6. **Run Docker Compose**
-`docker-compose up -d`
+5. **Run Docker Swarm Script**
+`bash scripts/swarm-start.sh`
