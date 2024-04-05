@@ -6,6 +6,8 @@ export const NETWORK = process.env.NETWORK ?? "testnet";
 
 console.log(`NETWORK: ${NETWORK}`);
 
+export const FORCE_START_BLOCK = process.env.FORCE_START_BLOCK;
+
 export const NEAR_TESTNET_CONFIG = {
     networkId: "near-testnet",
     nodeUrl: "https://rpc.testnet.near.org",
