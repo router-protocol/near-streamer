@@ -1,4 +1,3 @@
-import e from 'cors';
 import * as path from 'path';
 
 require("dotenv").config({ path: path.resolve(__dirname, '../../.env') });
@@ -28,7 +27,7 @@ export const NEAR_MAINNET_CONFIG = {
     assetForwarder: "assetforwarder-routerprotocol.near",
     assetBridge: "assetforwarder-routerprotocol.near",
     gateway: "gateway-routerprotocol.near",
-    s3BucketName: "near-lake-data-testnet",
+    s3BucketName: "near-lake-data-mainnet",
     s3RegionName: "eu-central-1",
     startBlockHeight: parseInt(process.env.START_BLOCK) ?? 144084600,
     blocksPreloadPoolSize: 1,
