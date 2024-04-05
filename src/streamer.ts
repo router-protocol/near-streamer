@@ -1,5 +1,5 @@
 import { startStream, types } from "near-lake-framework";
-import { LOOK_BACK_BLOCKS, NEAR_TESTNET_CONFIG as NEAR_CONFIG } from "./constant";
+import { LOOK_BACK_BLOCKS, NEAR_CONFIG } from "./constant";
 import logger from "./logger";
 import { getLastSyncedBlock, updateLastUpdatedBlock } from "./db/mongoDB/action/chainState";
 import { getCollection } from "./db/mongoDB/";
