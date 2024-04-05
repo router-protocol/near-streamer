@@ -1,5 +1,5 @@
 import { startStream, types } from "near-lake-framework";
-import { LOOK_BACK_BLOCKS, NEAR_CONFIG } from "./constant";
+import { FORCE_START_BLOCK, LOOK_BACK_BLOCKS, NEAR_CONFIG } from "./constant";
 import logger from "./logger";
 import { getLastSyncedBlock, updateLastUpdatedBlock } from "./db/mongoDB/action/chainState";
 import { getCollection } from "./db/mongoDB/";
@@ -140,7 +140,7 @@ export const startStreamService = async () => {
         const startBlock = lastSyncedBlock
             ? lastSyncedBlock - LOOK_BACK_BLOCKS
             : lakeConfig.startBlockHeight;
-        const latestLakeConfig = { ...lakeConfig, startBlockHeight: startBlock };
+        const latestLakeConfig = { ...lakeConfig, startBlockHeight: FORCE_START_BLOCK ? parseInt(FORCE_START_BLOCK) : startBlock };
         logger.info(`Starting stream from block ${startBlock}`);
         await startStream(latestLakeConfig, handleStreamerMessage);
     } catch (e) {
