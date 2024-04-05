@@ -46,7 +46,7 @@ async function main() {
         app.listen(PORT, () => {
             logger.info(`Server is running on http://localhost:${PORT}`);
         });
-        console.log("custom", custom)
+        // console.log("custom", custom)
         if (custom !== "only-server") {
             startStreamService();
         }

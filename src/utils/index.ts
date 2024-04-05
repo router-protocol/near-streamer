@@ -8,12 +8,14 @@ export const getEventId = (blocklog: any) => {
 
 export const fetchContractsToTrack = async (): Promise<string[]> => {
     logger.info("Fetching contracts to track")
+
     if (LCD === "") {
         return [NEAR_CONFIG.assetBridge, NEAR_CONFIG.gateway]
     }
     return fetch(LCD).then((res) => {
         return res.json();
     }).then((res) => {
+
         const contractConfig = res["contractConfig"];
         return contractConfig.filter((contract: any) => {
             return contract["chainId"] === CHAIN_ID && contract["contract_enabled"] === true;
