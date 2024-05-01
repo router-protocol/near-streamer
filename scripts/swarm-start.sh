@@ -49,9 +49,9 @@ docker service create \
     --restart-condition on-failure \
     --restart-delay 10s \
     --limit-cpu 2 \
-    --restart-max-attempts 5 \
+    --restart-max-attempts 1 \
     --env-file "$ENV_PATH" \
-    -p 6900:6900 \
+    -p 6903:6903 \
     --host "host.docker.internal:host-gateway" \
     --mount type=bind,source="$AWS_CREDENTIALS_PATH",target=/root/.aws/ \
     $IMAGE_NAME

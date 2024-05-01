@@ -17,7 +17,7 @@ export const NEAR_TESTNET_CONFIG = {
     gateway: "gateway-1692892905501.router_protocol.testnet",
     s3BucketName: "near-lake-data-testnet",
     s3RegionName: "eu-central-1",
-    startBlockHeight: parseInt(process.env.START_BLOCK) ?? 144084600,
+    startBlockHeight: parseInt(process.env.START_BLOCK) ?? -1,
     blocksPreloadPoolSize: 1,
     nearExplorerApi: "https://api-testnet.nearblocks.io",
 };
@@ -31,7 +31,7 @@ export const NEAR_MAINNET_CONFIG = {
     gateway: "gateway-routerprotocol.near",
     s3BucketName: "near-lake-data-mainnet",
     s3RegionName: "eu-central-1",
-    startBlockHeight: parseInt(process.env.START_BLOCK) ?? 144084600,
+    startBlockHeight: parseInt(process.env.START_BLOCK) ?? -1,
     blocksPreloadPoolSize: 1,
     nearExplorerApi: "https://api.nearblocks.io",
 };

@@ -6,7 +6,7 @@ set -e
 
 DB_IMAGE_NAME="mongo:6-jammy"
 DB_SERVICE_NAME="near-streamer-1-db"
-DB_VOLUME_PATH="./db-alpha"
+DB_VOLUME_PATH="$(pwd)/db-alpha"
 ENV_PATH="$(pwd)/.env"
 
 service_exists() {
@@ -42,10 +42,10 @@ docker service create \
     --restart-condition on-failure \
     --restart-delay 10s \
     --limit-cpu 2 \
-    --restart-max-attempts 5 \
+    --restart-max-attempts 1 \
     --env-file "$ENV_PATH" \
-    -p 27018:27018 \
-    --mount type=volume,source="$DB_VOLUME_PATH",target=/data/db \
+    -p 27018:27017 \
+    --mount type=bind,source="$DB_VOLUME_PATH",target=/data/db \
     $DB_IMAGE_NAME
 
 echo "$DB_SERVICE_NAME service created successfully."

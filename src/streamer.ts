@@ -3,8 +3,10 @@ import { FORCE_START_BLOCK, LOOK_BACK_BLOCKS, NEAR_CONFIG } from "./constant";
 import logger from "./logger";
 import { getLastSyncedBlock, updateLastUpdatedBlock } from "./db/mongoDB/action/chainState";
 import { getCollection } from "./db/mongoDB/";
-import { createTTLIndex, putNewBlocklog } from "./db/mongoDB/action/blockLog";
+import { putNewBlocklog } from "./db/mongoDB/action/blockLog";
 import { fetchContractsToTrack } from "./utils";
+const nearAPI = require("near-api-js");
+const { connect } = nearAPI;
 
 // const FUNDS_PAID = "funds_paid";
 // const FUNDS_PAID_WITH_MESSAGE = "funds_paid_with_message";
@@ -137,9 +139,20 @@ export const startStreamService = async () => {
         }
         const chainStatecollection = await getCollection("chainstates");
         const lastSyncedBlock = await getLastSyncedBlock(chainStatecollection);
-        const startBlock = lastSyncedBlock
-            ? lastSyncedBlock - LOOK_BACK_BLOCKS
-            : lakeConfig.startBlockHeight;
+        // let initialStartBlock = lastSyncedBlock
+        // const startBlock = lastSyncedBlock
+        //     ? lastSyncedBlock - LOOK_BACK_BLOCKS
+        //     : lakeConfig.startBlockHeight;
+        let startBlock = lakeConfig.startBlockHeight
+        if (lastSyncedBlock) {
+            startBlock = lastSyncedBlock - LOOK_BACK_BLOCKS
+        } else if (startBlock < 0) {
+            const nearConnection = await connect(NEAR_CONFIG);
+            const latestBlockHeight: number = await nearConnection.connection.provider.status().then((status) => {
+                return status.sync_info.latest_block_height;
+            });
+            startBlock = latestBlockHeight
+        }
         const latestLakeConfig = { ...lakeConfig, startBlockHeight: FORCE_START_BLOCK ? parseInt(FORCE_START_BLOCK) : startBlock };
         logger.info(`Starting stream from block ${startBlock}`);
         await startStream(latestLakeConfig, handleStreamerMessage);
