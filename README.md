@@ -12,7 +12,7 @@ Ensure that you have Docker, Node.js, and Yarn installed on your machine. If not
 
 `git clone https://github.com/router-protocol/near-streamer.git`
 
-3. **Aws Configuration**
+2. **Aws Configuration**
    ### For listening NEAR
 
    To access the data provided by [NEAR Lake](/tools/realtime#near-lake-indexer) you need to provide valid AWS credentials in order to be charged by the AWS for the S3 usage.
@@ -30,7 +30,7 @@ Ensure that you have Docker, Node.js, and Yarn installed on your machine. If not
    ```
    Save this file as `./aws_credentials/credentials`
 
-4. **Create `.env` file**
+3. **Create `.env` file**
 Update the following environment variables from `.env.example` file:
 ```yaml
 - MONGO_DB_URI=mongodb://mongodb:27018/
