@@ -15,8 +15,8 @@ service_exists() {
 
 validate_dir_path() {
     if [ ! -d "$1" ]; then
-        echo "$1 directory not found. Please create and retry."
-        exit 1
+        echo "$1 directory not found. Creating directory..."
+        mkdir -p "$1"
     fi
 }
 
@@ -26,6 +26,8 @@ validate_file_path() {
         exit 1
     fi
 }
+
+validate_dir_path "$DB_VOLUME_PATH"  # Ensure directory exists or create it
 
 if validate_file_path "$ENV_PATH"; then
     echo "ENV file found"
@@ -37,7 +39,7 @@ if service_exists $DB_SERVICE_NAME; then
 fi
 
 echo "Creating $DB_SERVICE_NAME service"
-docker service create \
+if docker service create \
     --name $DB_SERVICE_NAME \
     --restart-condition on-failure \
     --restart-delay 10s \
@@ -46,6 +48,8 @@ docker service create \
     --env-file "$ENV_PATH" \
     -p 27018:27017 \
     --mount type=bind,source="$DB_VOLUME_PATH",target=/data/db \
-    $DB_IMAGE_NAME
-
-echo "$DB_SERVICE_NAME service created successfully."
+    $DB_IMAGE_NAME; then
+    echo "$DB_SERVICE_NAME service created successfully."
+else
+    echo "Failed to create $DB_SERVICE_NAME service."
+fi
