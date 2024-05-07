@@ -17,10 +17,10 @@ Ensure that you have Docker, Node.js, and Yarn installed on your machine. If not
 
    To access the data provided by [NEAR Lake](/tools/realtime#near-lake-indexer) you need to provide valid AWS credentials in order to be charged by the AWS for the S3 usage.
 
-    :::info AWS-cli
+    ### info AWS-cli
 
    We will require AWS CLI to access to query S3. If you don't have AWS CLI, please follow these steps. [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
-   :::
+   
    ### AWS S3 Credentials
    To be able to get objects from the AWS S3 bucket you need to provide the AWS credentials.
 
@@ -52,3 +52,6 @@ Update the following environment variables from `.env.example` file:
 
 2. **Run Docker Swarm Script**
 `bash scripts/swarm-start.sh`
+
+3. **Health Check for service**
+`curl http://localhost:6903/health`
