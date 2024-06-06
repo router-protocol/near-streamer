@@ -40,8 +40,8 @@ images:
 
 # Substitute variables
 substitutions:
-  _REGION: "us-central1"
-  _REPOSITORY: "router-utilities"
+  _REGION: "asia-south1"
+  _REPOSITORY: "router-apps-asia-south"
   _IMAGE: "near-streamer"
   _KUBE_CLUSTER: "mainnet-tools"
   _KUBE_DEPLOYMENT: "near-streamer-one"

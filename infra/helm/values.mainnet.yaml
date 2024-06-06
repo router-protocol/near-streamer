@@ -4,7 +4,7 @@ app: near-streamer-one
 env: mainnet
 
 image:
-  repository: us-central1-docker.pkg.dev/router-mainnet-api/router-utilities/near-streamer
+  repository: asia-docker.pkg.dev/router-mainnet-api/router-apps-asia-south/near-streamer
   tag: v1
   pullPolicy: IfNotPresent
 
