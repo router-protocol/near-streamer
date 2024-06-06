@@ -27,7 +27,7 @@ steps:
       - "-c"
       - |
         set -ex
-        gcloud container clusters get-credentials ${_KUBE_CLUSTER} --zone ${_REGION} --project ${PROJECT_ID}
+        gcloud container clusters get-credentials ${_KUBE_CLUSTER} --region ${_REGION} --project ${PROJECT_ID}
         curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
         helm dependency update ${_HELM_CHART}
         helm upgrade --install ${_KUBE_DEPLOYMENT} ${_HELM_CHART} \
