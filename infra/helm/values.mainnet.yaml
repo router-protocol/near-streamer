@@ -1,0 +1,42 @@
+replicaCount: 1
+
+app: near-streamer-one
+env: mainnet
+
+image:
+  repository: us-central1-docker.pkg.dev/router-mainnet-api/router-utilities/near-streamer
+  tag: v1
+  pullPolicy: IfNotPresent
+
+container:
+  secretName: near-streamer-one-env
+  awsSecretName: near-streamer-one-aws-secret
+
+service:
+  type: NodePort
+  name: near-streamer-service
+  port: 6900
+  targetPort: 6900
+
+sslcert:
+  enabled: true
+  name: "near-streamer-tls"
+  host: "api.near-streamer-one.routerprotocol.com"
+
+autoscaling:
+  enabled: true
+  targetCPUUtilizationPercentage: 80
+  minReplicas: 1
+  maxReplicas: 1
+
+ingress:
+  enabled: true
+  className: "gce"
+
+backendConfig:
+  healthCheck:
+    requestPath: /health
+    checkIntervalSec: 30
+    timeoutSec: 10
+    healthyThreshold: 1
+    unhealthyThreshold: 2

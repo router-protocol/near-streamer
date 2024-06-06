@@ -1,0 +1,46 @@
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: {{ .Values.app }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Values.app }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.app }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app }}
+    spec:
+      containers:
+      - name: {{ .Values.app }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+          - containerPort: {{ .Values.service.port }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.backendConfig.healthCheck.requestPath }}
+            port: {{ .Values.service.port }}
+          initialDelaySeconds: 60
+          periodSeconds: 20
+          timeoutSeconds: 20
+          successThreshold: 1
+          failureThreshold: 5
+        volumeMounts:
+        - name: app-env
+          mountPath: /app/.env
+          subPath: .env
+        - name: aws-env
+          mountPath: /root/.aws/credentials
+          subPath: credentials
+      volumes:
+      - name: app-env
+        secret:
+          secretName: {{ .Values.container.secretName }}
+      - name: aws-env
+        secret:
+          secretName: {{ .Values.container.awsSecretName }}

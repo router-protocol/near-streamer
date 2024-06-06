@@ -1,0 +1,12 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: {{ .Values.sslcert.name }}
+  annotations:
+    "helm.sh/hook": "post-install,post-upgrade"
+    "helm.sh/hook-weight": "20"
+spec:
+  domains:
+    - "{{ .Values.sslcert.host }}"
+{{- end }}

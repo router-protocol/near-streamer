@@ -1,0 +1,6 @@
+apiVersion: v2
+name: near-streamer-servicer
+description: A Helm chart for near-streamer-servicer
+type: application
+version: 0.1.0
+appVersion: "1.0"
