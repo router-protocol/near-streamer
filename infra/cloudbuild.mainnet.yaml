@@ -33,7 +33,7 @@ steps:
         helm upgrade --install ${_KUBE_DEPLOYMENT} ${_HELM_CHART} \
           --namespace ${_KUBE_NAMESPACE} \
           --values ${_HELM_VALUES} \
-          --set image.tag=${SHORT_SHA}
+          --set image.tag=${SHORT_SHA} --reuse-value
 
 images:
   - "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE}:${SHORT_SHA}"
