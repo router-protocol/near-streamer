@@ -5,7 +5,7 @@ env: mainnet
 
 image:
   repository: asia-south1-docker.pkg.dev/router-mainnet-api/router-apps-asia-south/near-streamer
-  tag: v1
+  tag: 9961a404ed8e
   pullPolicy: IfNotPresent
 
 container:
@@ -35,7 +35,10 @@ autoscaling:
 
 ingress:
   enabled: true
-  className: "gce"
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    networking.gke.io/v1: "managed-certificates"
+    "helm.sh/resource-policy": "keep"
 
 backendConfig:
   healthCheck:
