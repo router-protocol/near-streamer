@@ -4,8 +4,9 @@ kind: ManagedCertificate
 metadata:
   name: {{ .Values.sslcert.name }}
   annotations:
-    "helm.sh/hook": "post-install,post-upgrade"
-    "helm.sh/hook-weight": "20"
+    {{- range $key, $value := .Values.sslcert.annotations }}
+    {{ $key }}: "{{ $value }}"
+    {{- end }}
 spec:
   domains:
     - "{{ .Values.sslcert.host }}"
