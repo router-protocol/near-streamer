@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# bash setup_secrets.sh --app-name near-streamer-two --project-name router-mainnet-api --region asia-south1 --kube-cluster mainnet-tools --kube-namespace near-streamer
+
 set -e
 
 # Function to prompt user for input with a default option to exit

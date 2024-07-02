@@ -1,6 +1,6 @@
 replicaCount: 1
 
-app: near-streamer-one
+app: near-streamer-two
 env: mainnet
 
 image:
@@ -9,7 +9,7 @@ image:
   pullPolicy: IfNotPresent
 
 container:
-  secretName: near-streamer-one-env
+  secretName: near-streamer-two-env
   awsSecretName: near-streamer-one-aws-secret
 
 service:
@@ -21,7 +21,7 @@ service:
 sslcert:
   enabled: true
   name: "near-streamer-tls"
-  host: "api.near-streamer-one.routerprotocol.com"
+  host: "api.near-streamer-two.routerprotocol.com"
   annotations:
     "helm.sh/hook": "post-install,post-upgrade"
     "helm.sh/hook-weight": "20"
