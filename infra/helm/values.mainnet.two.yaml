@@ -14,13 +14,13 @@ container:
 
 service:
   type: NodePort
-  name: near-streamer-service
+  name: near-streamer-service-two
   port: 6900
   targetPort: 6900
 
 sslcert:
   enabled: true
-  name: "near-streamer-tls"
+  name: "near-streamer-tls-two"
   host: "api.near-streamer-two.routerprotocol.com"
   annotations:
     "helm.sh/hook": "post-install,post-upgrade"
