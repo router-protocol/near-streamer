@@ -1,0 +1,49 @@
+replicaCount: 1
+
+app: near-streamer-three
+env: mainnet
+
+image:
+  repository: asia-south1-docker.pkg.dev/router-mainnet-api/router-apps-asia-south/near-streamer
+  tag: latest
+  pullPolicy: IfNotPresent
+
+container:
+  secretName: near-streamer-three-env
+  awsSecretName: near-streamer-one-aws-secret
+
+service:
+  type: NodePort
+  name: near-streamer-service-three
+  port: 6900
+  targetPort: 6900
+
+sslcert:
+  enabled: true
+  name: "near-streamer-tls-three"
+  host: "api.near-streamer-three.routerprotocol.com"
+  annotations:
+    "helm.sh/hook": "post-install,post-upgrade"
+    "helm.sh/hook-weight": "20"
+    "helm.sh/resource-policy": "keep"
+
+autoscaling:
+  enabled: true
+  targetCPUUtilizationPercentage: 80
+  minReplicas: 1
+  maxReplicas: 1
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    networking.gke.io/v1: "managed-certificates"
+    "helm.sh/resource-policy": "keep"
+
+backendConfig:
+  healthCheck:
+    requestPath: /health
+    checkIntervalSec: 30
+    timeoutSec: 10
+    healthyThreshold: 1
+    unhealthyThreshold: 2
