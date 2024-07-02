@@ -36,7 +36,7 @@ steps:
           --set image.tag=${SHORT_SHA} \
           --reuse-values
 
-          helm upgrade --install ${_KUBE_DEPLOYMENT_TWO} ${_HELM_CHART} \
+        helm upgrade --install ${_KUBE_DEPLOYMENT_TWO} ${_HELM_CHART} \
           --namespace ${_KUBE_NAMESPACE} \
           --values ${_HELM_VALUES_TWO} \
           --set image.tag=${SHORT_SHA} \
@@ -56,4 +56,4 @@ substitutions:
   _HELM_CHART: "./infra/helm"
   _HELM_VALUES: "./infra/helm/values.mainnet.yaml"
   _KUBE_DEPLOYMENT_TWO: "near-streamer-two"
-  _HELM_VALUES_TWO: "./infra/helm/values.mainnet.yaml"
+  _HELM_VALUES_TWO: "./infra/helm/values.mainnet.two.yaml"
