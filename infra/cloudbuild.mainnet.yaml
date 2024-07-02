@@ -42,6 +42,12 @@ steps:
           --set image.tag=${SHORT_SHA} \
           --reuse-values
 
+        helm upgrade --install ${_KUBE_DEPLOYMENT_THREE} ${_HELM_CHART} \
+          --namespace ${_KUBE_NAMESPACE} \
+          --values ${_HELM_VALUES_THREE} \
+          --set image.tag=${SHORT_SHA} \
+          --reuse-values
+
 images:
   - "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE}:${SHORT_SHA}"
 
@@ -57,3 +63,5 @@ substitutions:
   _HELM_VALUES: "./infra/helm/values.mainnet.yaml"
   _KUBE_DEPLOYMENT_TWO: "near-streamer-two"
   _HELM_VALUES_TWO: "./infra/helm/values.mainnet.two.yaml"
+  _KUBE_DEPLOYMENT_THREE: "near-streamer-three"
+  _HELM_VALUES_THREE: "./infra/helm/values.mainnet.three.yaml"
