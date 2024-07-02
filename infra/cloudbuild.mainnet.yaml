@@ -29,7 +29,7 @@ steps:
         set -ex
         gcloud container clusters get-credentials ${_KUBE_CLUSTER} --region ${_REGION} --project ${PROJECT_ID}
         curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-        for VALUES_FILE in ${_HELM_VALUES_PATTERN}
+        for VALUES_FILE in $(ls ./infra/helm/values.mainnet.*.yaml)
         do
           DEPLOYMENT_NAME=$(basename $VALUES_FILE | sed 's/values\.\(.*\)\.yaml/\1/')
           helm dependency update ${_HELM_CHART}
@@ -51,4 +51,3 @@ substitutions:
   _KUBE_CLUSTER: "mainnet-tools"
   _KUBE_NAMESPACE: "near-streamer"
   _HELM_CHART: "./infra/helm"
-  _HELM_VALUES_PATTERN: "./infra/helm/values.mainnet.*.yaml"
