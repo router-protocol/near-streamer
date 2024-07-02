@@ -20,7 +20,7 @@ steps:
         "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE}:${SHORT_SHA}",
       ]
 
-  # Step 3: Set up Helm and deploy for multiple configurations
+  # Step 3: Set up Helm and deploy
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     entrypoint: "bash"
     args:
@@ -29,16 +29,18 @@ steps:
         set -ex
         gcloud container clusters get-credentials ${_KUBE_CLUSTER} --region ${_REGION} --project ${PROJECT_ID}
         curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-        for VALUES_FILE in ${_HELM_VALUES_FILES}
-        do
-          DEPLOYMENT_NAME=$(basename $VALUES_FILE | sed 's/values\.\(.*\)\.yaml/\1/')
-          helm dependency update ${_HELM_CHART}
-          helm upgrade --install $DEPLOYMENT_NAME ${_HELM_CHART} \
-            --namespace ${_KUBE_NAMESPACE} \
-            --values $VALUES_FILE \
-            --set image.tag=${SHORT_SHA} \
-            --reuse-values
-        done
+        helm dependency update ${_HELM_CHART}
+        helm upgrade --install ${_KUBE_DEPLOYMENT} ${_HELM_CHART} \
+          --namespace ${_KUBE_NAMESPACE} \
+          --values ${_HELM_VALUES} \
+          --set image.tag=${SHORT_SHA} \
+          --reuse-values
+
+          helm upgrade --install ${_KUBE_DEPLOYMENT_TWO} ${_HELM_CHART} \
+          --namespace ${_KUBE_NAMESPACE} \
+          --values ${_HELM_VALUES_TWO} \
+          --set image.tag=${SHORT_SHA} \
+          --reuse-values
 
 images:
   - "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE}:${SHORT_SHA}"
@@ -49,6 +51,9 @@ substitutions:
   _REPOSITORY: "router-apps-asia-south"
   _IMAGE: "near-streamer"
   _KUBE_CLUSTER: "mainnet-tools"
+  _KUBE_DEPLOYMENT: "near-streamer-one"
   _KUBE_NAMESPACE: "near-streamer"
   _HELM_CHART: "./infra/helm"
-  _HELM_VALUES_FILES: "./infra/helm/values.mainnet.one.yaml ./infra/helm/values.mainnet.two.yaml"
+  _HELM_VALUES: "./infra/helm/values.mainnet.yaml"
+  _KUBE_DEPLOYMENT_TWO: "near-streamer-two"
+  _HELM_VALUES_TWO: "./infra/helm/values.mainnet.yaml"
