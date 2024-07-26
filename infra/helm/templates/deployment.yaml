@@ -1,5 +1,5 @@
-apiVersion: "apps/v1"
-kind: "Deployment"
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: {{ .Values.app }}
   namespace: {{ .Release.Namespace }}
@@ -30,13 +30,13 @@ spec:
           timeoutSeconds: 20
           successThreshold: 1
           failureThreshold: 5
-      resources:
-        requests:
-          memory: {{ .Values.resources.requests.memory }}
-          cpu: {{ .Values.resources.requests.cpu }}
-        limits:
-          memory: {{ .Values.resources.limits.memory }}
-          cpu: {{ .Values.resources.limits.cpu }}
+        resources:
+          requests:
+            memory: {{ .Values.resources.requests.memory }}
+            cpu: {{ .Values.resources.requests.cpu }}
+          limits:
+            memory: {{ .Values.resources.limits.memory }}
+            cpu: {{ .Values.resources.limits.cpu }}
         volumeMounts:
         - name: app-env
           mountPath: /app/.env
