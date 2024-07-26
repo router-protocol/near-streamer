@@ -47,3 +47,11 @@ backendConfig:
     timeoutSec: 10
     healthyThreshold: 1
     unhealthyThreshold: 2
+
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "150m"
+  limits:
+    memory: "400Mi"
+    cpu: "250m"
